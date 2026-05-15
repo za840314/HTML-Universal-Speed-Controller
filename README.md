@@ -1,75 +1,110 @@
 # HTML Universal Speed Controller
 
-A browser extension that controls the speed of timing-based behavior on web
-pages by hooking `setInterval`, `setTimeout`, `Date.now`, `performance.now`,
-and (optionally) `requestAnimationFrame`. Useful for accelerating countdown
-timers and "please wait X seconds" screens on ad and download pages.
+A browser extension that speeds up (or pauses) timers, countdowns, and
+animations on web pages. Handy for getting past "please wait 30 seconds"
+screens and countdown timers on ad and download pages.
 
-Based on [patanahid/HTML-Universal-Speed-Controller](https://github.com/patanahid/HTML-Universal-Speed-Controller).
-This repository contains bug-fixed builds for both Firefox and Chrome.
+Works on **Google Chrome** and **Firefox**. Based on
+[patanahid/HTML-Universal-Speed-Controller](https://github.com/patanahid/HTML-Universal-Speed-Controller),
+with several bugs fixed (see [What was fixed](#what-was-fixed)).
 
-## Repository layout
+---
 
-| Folder     | Build                                  |
-|------------|----------------------------------------|
-| `firefox/` | Manifest V2 build for Firefox          |
-| `chrome/`  | Manifest V3 build for Chrome           |
+## Download
 
-The two builds share the same speed-control logic (`inject.js`); they differ
-only in manifest format and a few browser-API details.
+**Easiest way:** click the green **`< > Code`** button near the top of this
+page, then click **Download ZIP**. Unzip it anywhere — you'll get a `firefox`
+folder and a `chrome` folder.
+
+**Or download just one browser's build** from the [`dist`](dist) folder:
+
+- [`dist/chrome.zip`](dist/chrome.zip) — for Google Chrome
+- [`dist/firefox.zip`](dist/firefox.zip) — for Firefox
+
+(Click the file, then click the **download** button on its page.)
+
+---
+
+## Install on Google Chrome
+
+This stays installed after you restart Chrome.
+
+1. **Download and unzip** the extension (see [Download](#download) above). Put
+   the `chrome` folder somewhere you won't delete it — for example your
+   Documents folder. *(Chrome loads it from that folder every time it starts,
+   so don't move or delete it afterward.)*
+2. Open a new tab and go to **`chrome://extensions`**
+3. Turn on **Developer mode** — the switch in the **top-right corner**.
+4. Click the **Load unpacked** button (top-left).
+5. Select the **`chrome`** folder and confirm.
+6. Done! Click the puzzle-piece icon in the toolbar and **pin** "HTML Universal
+   Speed Controller" so its icon is always visible.
+
+> If Chrome shows a warning bubble about developer-mode extensions when it
+> starts, just close it — the extension keeps working. Developer mode must stay
+> turned on.
+
+---
 
 ## Install on Firefox
 
-Firefox only allows unsigned extensions to be loaded *temporarily* (they unload
-when Firefox restarts):
+Firefox unloads this kind of add-on every time it restarts, so you'll redo
+these quick steps after each restart.
 
-1. Open `about:debugging#/runtime/this-firefox`
-2. Click **Load Temporary Add-on…**
-3. Select `firefox/manifest.json`
+1. **Download** [`dist/firefox.zip`](dist/firefox.zip) (see
+   [Download](#download) above). You do **not** need to unzip it.
+2. Open a new tab and go to **`about:debugging#/runtime/this-firefox`**
+3. Click **Load Temporary Add-on…**
+4. Select the **`firefox.zip`** file you downloaded.
+5. Done! The Speed Controller icon appears in your toolbar.
 
-To keep it installed permanently you would need Firefox Developer Edition or
-Nightly with `xpinstall.signatures.required` set to `false` in `about:config`,
-then install the packaged build via `about:addons`.
+> After you restart Firefox, repeat steps 2–4 to load it again. A permanent
+> install requires a signed build, which needs a Mozilla developer account.
 
-## Install on Chrome
+---
 
-Chrome's unpacked installs **persist across restarts**:
+## How to use
 
-1. Open `chrome://extensions`
-2. Enable **Developer mode** (top-right)
-3. Click **Load unpacked**
-4. Select the `chrome/` folder
+1. Click the **Speed Controller** icon in your toolbar.
+2. Click a speed — for example **5x** or **20x**.
+3. The page's timers and countdowns now run that many times faster.
+   - **Normal** = back to 1x (normal speed)
+   - **Stop** = freeze timers
+4. If a countdown doesn't speed up, **reload the page** and pick the speed
+   again. If it still won't move, open the popup and turn on the
+   **requestAnimationFrame** toggle (some sites run their countdown from the
+   animation loop).
+5. The **Settings** page lets you save custom speed presets and set a site to
+   speed up automatically every time you visit it.
 
-Keep the folder where it is — Chrome reloads it from that path on every launch.
-Developer mode must stay enabled.
+---
 
-## Usage
+## What was fixed
 
-- Click the toolbar icon and pick a speed.
-- The toggles choose which timing methods are hooked (`setInterval`,
-  `setTimeout`, `performance`, `Date.now`, `requestAnimationFrame`).
-  `requestAnimationFrame` is off by default — enable it if a site drives its
-  countdown from the animation loop.
-- The **Settings** page supports per-site auto-speed rules and custom presets.
+Compared with the original project, these builds fix:
 
-## Fixes applied over the original
+- **Didn't work on many sites** — the speed code is now injected in a way that
+  a website's security policy (CSP) can't block.
+- **`Date.now` crash** — an infinite loop in the date override was removed.
+- **Speed changes not applying** — existing timers are now correctly re-timed
+  when you change the speed, with no double-speed glitches.
+- **Broken popup layout** — the popup no longer collapses into a thin strip.
+- **Chrome support** — added a Manifest V3 build so it runs on modern Chrome.
 
-- **CSP-safe injection.** The page-world hook is now loaded as a real script
-  resource instead of an inline `<script>`, so it is no longer blocked by a
-  site's Content-Security-Policy.
-- **`Date.now` infinite recursion** removed; `Date.now` / `performance.now` now
-  share one virtual clock.
-- **Timer re-timing** fixed so that changing the speed correctly re-times
-  intervals that already exist, without double-firing them.
-- **`notifications` permission** added and the notification icon path
-  corrected.
-- **Popup width** fixed — a stray mobile media query was collapsing the popup
-  into a thin vertical strip.
-- **Chrome build** ported to Manifest V3 (service worker, `world: "MAIN"`
-  content script, PNG icons).
+---
+
+## Repository layout
+
+| Folder         | What it is                                  |
+|----------------|---------------------------------------------|
+| `chrome/`      | Chrome (Manifest V3) source files           |
+| `firefox/`     | Firefox (Manifest V2) source files          |
+| `dist/`        | Ready-to-download `.zip` bundles            |
+
+---
 
 ## Disclaimer
 
-Provided for personal use. Speeding up a site only changes timing in your own
-browser; it cannot affect anything decided by a server (e.g. game outcomes or
-server-validated cooldowns).
+For personal use. Speeding up a site only changes timing inside your own
+browser — it cannot change anything decided by a server (such as game outcomes
+or server-checked cooldown timers).

@@ -4,6 +4,10 @@
 *.crx
 web-ext-artifacts/
 
+# ...except the ready-to-download bundles published with the repo
+!dist/firefox.zip
+!dist/chrome.zip
+
 # Dependencies
 node_modules/
 
