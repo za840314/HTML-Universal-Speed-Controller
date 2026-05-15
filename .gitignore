@@ -1,0 +1,15 @@
+# Build artifacts / packaged extensions
+*.zip
+*.xpi
+*.crx
+web-ext-artifacts/
+
+# Dependencies
+node_modules/
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
