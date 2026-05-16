@@ -41,6 +41,12 @@
   // Effectively-infinite delay used to "pause" timers when speed is 0.
   const MAX_DELAY = 2147483647;
 
+  // Cap on the real elapsed time a single advanceClock() call will scale up.
+  // A main-thread stall otherwise yields a huge virtual jump; a page running
+  // an accumulator-based game loop then tries to simulate all of it at once
+  // and freezes the tab ("spiral of death"). Clamping bounds the catch-up.
+  const MAX_TICK_ELAPSED = 200;
+
   // Virtual clock: accumulates the *extra* elapsed time produced by speed != 1.
   // performance.now()/Date.now() report originalNow + virtualOffset.
   let virtualOffset = 0;
@@ -48,7 +54,8 @@
 
   const advanceClock = () => {
     const now = originalPerformanceNow();
-    virtualOffset += (now - lastClockUpdate) * (speedConfig.speed - 1);
+    const elapsed = Math.min(now - lastClockUpdate, MAX_TICK_ELAPSED);
+    virtualOffset += elapsed * (speedConfig.speed - 1);
     lastClockUpdate = now;
     return virtualOffset;
   };
