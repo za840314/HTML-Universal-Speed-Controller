@@ -45,7 +45,7 @@
   // A main-thread stall otherwise yields a huge virtual jump; a page running
   // an accumulator-based game loop then tries to simulate all of it at once
   // and freezes the tab ("spiral of death"). Clamping bounds the catch-up.
-  const MAX_TICK_ELAPSED = 200;
+  const MAX_TICK_ELAPSED = 170;
 
   // Lower bound on the real delay handed to the browser when speed > 1.
   // Without it a fast timer is rescheduled every fraction of a millisecond;
