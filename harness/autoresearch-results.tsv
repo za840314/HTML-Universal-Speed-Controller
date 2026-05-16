@@ -1,0 +1,6 @@
+iter	change	score	guard	decision	notes
+0	baseline (unmodified inject.js)	1210594	pass	baseline	50x spirals into a frozen tab
+1	clamp per-tick elapsed, MAX_TICK_ELAPSED=200	4949	pass	keep	crash eliminated; score now dominated by timer-fire count
+2	floor compressed timer delay at 8ms (speed>1)	1667	pass	keep	timer saturation bounded; 3x improvement
+3	tighten MAX_TICK_ELAPSED 200->170	1426	pass	keep	small worstFrame gain; both core fixes now in
+4	verify-only: confirmed no crash at 25/50/100/200x	1426	pass	converged	further floor/clamp tuning = metric-gaming, no real-world gain
