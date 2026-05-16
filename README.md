@@ -1,12 +1,9 @@
 # HTML Universal Speed Controller
 
 A browser extension that speeds up (or pauses) timers, countdowns, and
-animations on web pages. Handy for getting past "please wait 30 seconds"
-screens and countdown timers on ad and download pages.
+animations on web pages.
 
-Works on Google Chrome and Firefox. Based on
-[patanahid/HTML-Universal-Speed-Controller](https://github.com/patanahid/HTML-Universal-Speed-Controller),
-with several bugs fixed (see [What was fixed](#what-was-fixed)).
+Works on Google Chrome and Firefox.
 
 ## Download
 
@@ -66,19 +63,6 @@ these quick steps after each restart.
 5. The **Settings** page lets you save custom speed presets and set a site to
    speed up automatically every time you visit it.
 
-## What was fixed
-
-Compared with the original project, these builds fix:
-
-- The speed code is now injected in a way a website's security policy (CSP)
-  can't block, so it works on far more sites.
-- An infinite loop in the `Date.now` override, which crashed the script, is
-  gone.
-- Changing the speed now re-times timers that already exist, without the old
-  double-speed glitches.
-- The popup no longer collapses into a thin vertical strip.
-- A Chrome (Manifest V3) build was added, so it runs on modern Chrome.
-
 ## Repository layout
 
 | Folder     | What it is                         |
@@ -86,9 +70,3 @@ Compared with the original project, these builds fix:
 | `chrome/`  | Chrome (Manifest V3) source files  |
 | `firefox/` | Firefox (Manifest V2) source files |
 | `dist/`    | Ready-to-download `.zip` bundles   |
-
-## Disclaimer
-
-For personal use. Speeding up a site only changes timing inside your own
-browser. It cannot change anything decided by a server, such as game outcomes
-or server-checked cooldown timers.
