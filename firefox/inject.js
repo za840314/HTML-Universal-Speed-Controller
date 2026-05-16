@@ -5,11 +5,11 @@
 
   let speedConfig = {
     speed: 1.0,
-    setInterval: true,
-    setTimeout: true,
+    setInterval: false,
+    setTimeout: false,
     performance: true,
-    dateNow: true,
-    requestAnimationFrame: false,
+    dateNow: false,
+    requestAnimationFrame: true,
     keepAlive: false,
     isMobile: /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent),
     developerMode: false,

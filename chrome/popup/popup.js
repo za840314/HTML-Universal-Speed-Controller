@@ -120,11 +120,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Get saved settings
   const settings = await browser.storage.local.get({
     speed: 1,
-    setInterval: true,
-    setTimeout: true,
+    setInterval: false,
+    setTimeout: false,
     performance: true,
-    dateNow: true,
-    requestAnimationFrame: false,
+    dateNow: false,
+    requestAnimationFrame: true,
     keepAlive: false,
     speedSteps: [20, 50, 100, 200, 500],
     autoSpeedSites: {}

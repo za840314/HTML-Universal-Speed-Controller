@@ -73,7 +73,6 @@ async function checkAutoSpeedSite() {
 
     if (currentHost in autoSpeedSites) {
       const speed = autoSpeedSites[currentHost];
-      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
       browser.runtime.sendMessage({
         action: "showNotification",
@@ -88,11 +87,11 @@ async function checkAutoSpeedSite() {
 
       postToPage("updateSettings", {
         speed,
-        setInterval: true,
-        setTimeout: true,
+        setInterval: false,
+        setTimeout: false,
         performance: true,
-        dateNow: true,
-        requestAnimationFrame: isMobile
+        dateNow: false,
+        requestAnimationFrame: true
       });
     } else {
       browser.runtime.sendMessage({

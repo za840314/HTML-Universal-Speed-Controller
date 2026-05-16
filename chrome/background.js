@@ -6,11 +6,11 @@ const browser = globalThis.browser || globalThis.chrome;
 browser.runtime.onInstalled.addListener(async () => {
   const defaultSettings = {
     speed: 2,
-    setInterval: true,
-    setTimeout: true,
+    setInterval: false,
+    setTimeout: false,
     performance: true,
-    dateNow: true,
-    requestAnimationFrame: false,
+    dateNow: false,
+    requestAnimationFrame: true,
     keepAlive: false,
     autoSpeedSites: []
   };
@@ -26,6 +26,20 @@ browser.runtime.onInstalled.addListener(async () => {
 
   if (Object.keys(newSettings).length > 0) {
     await browser.storage.local.set(newSettings);
+  }
+
+  // One-time migration to the performance + requestAnimationFrame default,
+  // for installs still carrying the original all-methods-on settings.
+  const { timingMethodsDefaultV2 } = await browser.storage.local.get("timingMethodsDefaultV2");
+  if (!timingMethodsDefaultV2) {
+    await browser.storage.local.set({
+      setInterval: false,
+      setTimeout: false,
+      performance: true,
+      dateNow: false,
+      requestAnimationFrame: true,
+      timingMethodsDefaultV2: true
+    });
   }
 });
 
