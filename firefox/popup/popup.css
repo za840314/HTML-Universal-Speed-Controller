@@ -15,7 +15,6 @@ body {
 
 /* Prevent text selection on mobile */
 .speed-btn,
-.auto-trigger-btn,
 #optionsButton,
 .toggle-item label {
   user-select: none;
@@ -33,47 +32,6 @@ h2 {
   margin: 0 0 10px 0;
   text-align: center;
   color: #4CAF50;
-}
-
-.auto-speed-button {
-  margin-bottom: 15px;
-}
-
-.auto-trigger-btn {
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 15px;
-  background-color: #484848;
-  border: 1px solid #404040;
-}
-
-.auto-trigger-btn.active {
-  background-color: #4CAF50;
-  border-color: #4CAF50;
-}
-
-.auto-trigger-btn.modified {
-  border: 2px solid #FFA500;
-  animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-  0% { border-color: #FFA500; }
-  50% { border-color: #FF8C00; }
-  100% { border-color: #FFA500; }
-}
-
-.auto-status {
-  font-weight: bold;
-}
-
-.auto-speed {
-  padding: 3px;
-  border-radius: 5px;
-  color: #ffffff;
-  background-color: rgb(62, 91, 62);
 }
 
 p {

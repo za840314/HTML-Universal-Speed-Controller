@@ -11,23 +11,7 @@
     dateNow: false,
     requestAnimationFrame: true,
     keepAlive: false,
-    isMobile: /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent),
-    developerMode: false,
-    logTimingMethods: false,
-    logPerformance: false,
-    logFrameUpdates: false,
-    logMobileOptimization: false
-  };
-
-  const log = (type, ...args) => {
-    if (!speedConfig.developerMode) return;
-    const shouldLog = {
-      timing: speedConfig.logTimingMethods,
-      performance: speedConfig.logPerformance,
-      frame: speedConfig.logFrameUpdates,
-      mobile: speedConfig.logMobileOptimization
-    }[type];
-    if (shouldLog) console.log(`[Speed Controller ${type}]`, ...args);
+    isMobile: /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
   };
 
   // Store the original timing functions before overriding them.
@@ -87,7 +71,6 @@
     delay = Number(delay) || 0;
     const realId = originalSetInterval(handler, adjustDelay(delay, speedConfig.setInterval), ...args);
     intervals.set(realId, { handler, delay, args, realId });
-    log("timing", `setInterval ${delay}ms -> id ${realId}`);
     return realId;
   };
 
@@ -99,7 +82,6 @@
     } else {
       originalClearInterval(id);
     }
-    log("timing", `clearInterval ${id}`);
   };
 
   window.setTimeout = function (handler, delay, ...args) {
@@ -120,7 +102,6 @@
         ...entry.args
       );
     }
-    log("timing", `Reloaded ${intervals.size} interval(s) at ${speedConfig.speed}x`);
   };
 
   window.performance.now = function () {
@@ -189,7 +170,7 @@
       keepAliveAudio = { ctx, osc };
       ctx.resume();
     } catch (e) {
-      log("timing", "keepalive audio unavailable", e);
+      /* AudioContext unavailable — keepalive audio simply does not start */
     }
   };
 
@@ -222,16 +203,12 @@
 
     if (data.action === "updateSettings") {
       advanceClock(); // flush elapsed time at the OLD speed before switching
-      const oldSpeed = speedConfig.speed;
       speedConfig = {
         ...speedConfig,
         ...data.settings,
         isMobile: speedConfig.isMobile
       };
-      log("timing", `Settings updated: ${oldSpeed}x -> ${speedConfig.speed}x`);
       reloadIntervals();
-    } else if (data.action === "updateLoggingSettings") {
-      speedConfig = { ...speedConfig, ...data.settings };
     } else if (data.action === "updateKeepAlive") {
       speedConfig.keepAlive = !!(data.settings && data.settings.keepAlive);
       applyKeepAlive();

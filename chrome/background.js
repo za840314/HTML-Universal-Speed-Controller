@@ -2,7 +2,7 @@
 // can be woken on demand.
 const browser = globalThis.browser || globalThis.chrome;
 
-// Initialize default settings when extension is installed
+// Initialize default settings when the extension is installed.
 browser.runtime.onInstalled.addListener(async () => {
   const defaultSettings = {
     speed: 2,
@@ -11,8 +11,7 @@ browser.runtime.onInstalled.addListener(async () => {
     performance: true,
     dateNow: false,
     requestAnimationFrame: true,
-    keepAlive: false,
-    autoSpeedSites: []
+    keepAlive: false
   };
 
   const existingSettings = await browser.storage.local.get(Object.keys(defaultSettings));
@@ -40,36 +39,5 @@ browser.runtime.onInstalled.addListener(async () => {
       requestAnimationFrame: true,
       timingMethodsDefaultV2: true
     });
-  }
-});
-
-// Listen for messages from content script
-browser.runtime.onMessage.addListener((message) => {
-  if (message.action === "showNotification") {
-    try {
-      const created = browser.notifications.create({
-        type: "basic",
-        iconUrl: browser.runtime.getURL("icons/icon-96.png"),
-        title: message.title,
-        message: message.message
-      });
-      if (created && typeof created.catch === "function") {
-        created.catch((e) => console.error("Speed Controller: notification failed:", e));
-      }
-    } catch (e) {
-      console.error("Speed Controller: notification failed:", e);
-    }
-  }
-  return true;
-});
-
-// Listen for tab updates to check if new page should have auto-speed
-browser.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
-  if (changeInfo.status === "complete" && tab.url) {
-    try {
-      await browser.tabs.sendMessage(tabId, { action: "checkAutoSpeed" });
-    } catch (e) {
-      // Ignore errors for tabs that don't have our content script
-    }
   }
 });
