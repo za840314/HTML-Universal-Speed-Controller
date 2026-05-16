@@ -41,6 +41,8 @@ browser.runtime.onMessage.addListener(async (message) => {
       await checkAutoSpeedSite();
     } else if (message.action === "updateLoggingSettings") {
       postToPage("updateLoggingSettings", message.settings);
+    } else if (message.action === "updateKeepAlive") {
+      postToPage("updateKeepAlive", message.settings);
     }
   } catch (error) {
     console.error("Speed Controller: error handling message:", error);
@@ -57,14 +59,16 @@ async function checkAutoSpeedSite() {
       logTimingMethods = false,
       logPerformance = false,
       logFrameUpdates = false,
-      logMobileOptimization = false
+      logMobileOptimization = false,
+      keepAlive = false
     } = await browser.storage.local.get([
       "autoSpeedSites",
       "developerMode",
       "logTimingMethods",
       "logPerformance",
       "logFrameUpdates",
-      "logMobileOptimization"
+      "logMobileOptimization",
+      "keepAlive"
     ]);
 
     postToPage("updateLoggingSettings", {
@@ -74,6 +78,8 @@ async function checkAutoSpeedSite() {
       logFrameUpdates,
       logMobileOptimization
     });
+
+    postToPage("updateKeepAlive", { keepAlive });
 
     if (currentHost in autoSpeedSites) {
       const speed = autoSpeedSites[currentHost];

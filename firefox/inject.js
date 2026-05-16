@@ -10,6 +10,7 @@
     performance: true,
     dateNow: true,
     requestAnimationFrame: false,
+    keepAlive: false,
     isMobile: /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent),
     developerMode: false,
     logTimingMethods: false,
@@ -141,6 +142,79 @@
     });
   };
 
+  // --- Background-throttle keepalive ----------------------------------------
+  // When enabled, the page is told it is always visible and focused, and a
+  // near-silent tone is played so the browser keeps the tab "audible" and does
+  // not throttle its timers while another window covers it. Best-effort: a page
+  // cannot fully override the browser's own occlusion handling.
+  let keepAliveAudio = null;
+
+  const installVisibilitySpoof = () => {
+    const spoof = (prop, value) => {
+      const orig = Object.getOwnPropertyDescriptor(Document.prototype, prop);
+      if (!orig || !orig.get) return;
+      Object.defineProperty(document, prop, {
+        configurable: true,
+        get() { return speedConfig.keepAlive ? value : orig.get.call(this); }
+      });
+    };
+    spoof("hidden", false);
+    spoof("visibilityState", "visible");
+    spoof("webkitHidden", false);
+    spoof("webkitVisibilityState", "visible");
+
+    const originalHasFocus = document.hasFocus.bind(document);
+    document.hasFocus = () => (speedConfig.keepAlive ? true : originalHasFocus());
+
+    // Stop visibility/blur events from reaching the page so it never pauses
+    // itself. Capture phase at document_start runs before any page listener.
+    const swallow = (e) => { if (speedConfig.keepAlive) e.stopImmediatePropagation(); };
+    document.addEventListener("visibilitychange", swallow, true);
+    document.addEventListener("webkitvisibilitychange", swallow, true);
+    window.addEventListener("blur", swallow, true);
+  };
+
+  const startKeepAliveAudio = () => {
+    if (keepAliveAudio) { keepAliveAudio.ctx.resume(); return; }
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    if (!Ctx) return;
+    try {
+      const ctx = new Ctx();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      gain.gain.value = 0.0025; // far below audible volume, enough to mark the tab "audible"
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      keepAliveAudio = { ctx, osc };
+      ctx.resume();
+    } catch (e) {
+      log("timing", "keepalive audio unavailable", e);
+    }
+  };
+
+  const stopKeepAliveAudio = () => {
+    if (!keepAliveAudio) return;
+    try { keepAliveAudio.osc.stop(); keepAliveAudio.ctx.close(); } catch (e) { /* already closed */ }
+    keepAliveAudio = null;
+  };
+
+  const applyKeepAlive = () => {
+    if (speedConfig.keepAlive) startKeepAliveAudio();
+    else stopKeepAliveAudio();
+  };
+
+  // An AudioContext stays suspended until a user gesture; nudge it on each
+  // gesture while keepalive is on (slot play supplies plenty of gestures).
+  const keepAliveResume = () => {
+    if (speedConfig.keepAlive && keepAliveAudio) keepAliveAudio.ctx.resume();
+  };
+  ["pointerdown", "keydown", "touchstart"].forEach((ev) =>
+    window.addEventListener(ev, keepAliveResume, true)
+  );
+
+  installVisibilitySpoof();
+
   // Receive configuration updates from the extension's content script.
   window.addEventListener("message", (e) => {
     const data = e.data;
@@ -158,6 +232,9 @@
       reloadIntervals();
     } else if (data.action === "updateLoggingSettings") {
       speedConfig = { ...speedConfig, ...data.settings };
+    } else if (data.action === "updateKeepAlive") {
+      speedConfig.keepAlive = !!(data.settings && data.settings.keepAlive);
+      applyKeepAlive();
     }
   });
 

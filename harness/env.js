@@ -48,7 +48,17 @@ function createSandbox() {
 
   const fakeDate = { now: () => clock.t };
 
-  const sandbox = { window, navigator: window.navigator, Date: fakeDate, console };
+  // Minimal document/Document so inject.js's visibility-spoof setup can load.
+  function HarnessDocument() {}
+  const document = Object.create(HarnessDocument.prototype);
+  document.hasFocus = () => true;
+  document.addEventListener = () => {};
+  document.removeEventListener = () => {};
+
+  const sandbox = {
+    window, navigator: window.navigator, Date: fakeDate, console,
+    document, Document: HarnessDocument
+  };
   vm.createContext(sandbox);
 
   const injectPath = path.join(__dirname, "..", "chrome", "inject.js");

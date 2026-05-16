@@ -7,6 +7,7 @@ browser.runtime.onInstalled.addListener(async () => {
     performance: true,
     dateNow: true,
     requestAnimationFrame: false,
+    keepAlive: false,
     autoSpeedSites: []
   };
 

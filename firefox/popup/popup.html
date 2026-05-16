@@ -18,11 +18,11 @@
     
     <div class="speed-buttons">
       <button class="speed-btn" data-speed="1">Normal</button>
-      <button class="speed-btn" data-speed="2">2x</button>
-      <button class="speed-btn" data-speed="5">5x</button>
-      <button class="speed-btn" data-speed="10">10x</button>
       <button class="speed-btn" data-speed="20">20x</button>
       <button class="speed-btn" data-speed="50">50x</button>
+      <button class="speed-btn" data-speed="100">100x</button>
+      <button class="speed-btn" data-speed="200">200x</button>
+      <button class="speed-btn" data-speed="500">500x</button>
       <button class="speed-btn stop-btn" data-speed="0">Stop</button>
     </div>
     <center><p>You can add or remove presets in the settings (below).</p></center>
@@ -58,6 +58,14 @@
           requestAnimationFrame
         </label>
       </div>
+    </div>
+
+    <div class="keep-alive">
+      <label class="toggle-item">
+        <input type="checkbox" id="keepAliveToggle">
+        Keep running in background
+      </label>
+      <p>Best-effort: keeps the page running when another window covers the tab.</p>
     </div>
 
     <p>Add custom domains in the settings.</p>

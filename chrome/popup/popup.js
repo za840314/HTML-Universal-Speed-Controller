@@ -112,6 +112,7 @@ const setTimeoutToggle = document.getElementById('setTimeoutToggle');
 const performanceToggle = document.getElementById('performanceToggle');
 const dateNowToggle = document.getElementById('dateNowToggle');
 const requestAnimationFrameToggle = document.getElementById('requestAnimationFrameToggle');
+const keepAliveToggle = document.getElementById('keepAliveToggle');
 const optionsButton = document.getElementById('optionsButton');
 
 // Load saved settings when popup opens
@@ -124,7 +125,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     performance: true,
     dateNow: true,
     requestAnimationFrame: false,
-    speedSteps: [2, 5, 10, 20, 50],
+    keepAlive: false,
+    speedSteps: [20, 50, 100, 200, 500],
     autoSpeedSites: {}
   });
 
@@ -162,6 +164,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   performanceToggle.checked = settings.performance;
   dateNowToggle.checked = settings.dateNow;
   requestAnimationFrameToggle.checked = settings.requestAnimationFrame;
+  keepAliveToggle.checked = settings.keepAlive;
 
   // Get current tab and check for auto-speed
   const tabs = await browser.tabs.query({ active: true, currentWindow: true });
@@ -403,6 +406,24 @@ toggles.forEach(toggle => {
       isAutoSpeed: isAutoSpeedActive
     });
   });
+});
+
+// Keep-alive toggle: independent of speed, so it sends its own message that
+// content.js relays unconditionally (not gated by auto-speed).
+keepAliveToggle.addEventListener('change', async () => {
+  const keepAlive = keepAliveToggle.checked;
+  await browser.storage.local.set({ keepAlive });
+  const tabs = await browser.tabs.query({ active: true, currentWindow: true });
+  if (tabs[0]) {
+    try {
+      await browser.tabs.sendMessage(tabs[0].id, {
+        action: 'updateKeepAlive',
+        settings: { keepAlive }
+      });
+    } catch (e) {
+      // Tab has no content script (e.g. a chrome:// page) — nothing to do.
+    }
+  }
 });
 
 // Options button click/touch handler

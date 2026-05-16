@@ -25,7 +25,7 @@ const logFrameUpdatesToggle = document.getElementById('logFrameUpdatesToggle');
 const logMobileOptimizationToggle = document.getElementById('logMobileOptimizationToggle');
 
 // Default settings
-const DEFAULT_SPEED_STEPS = [2, 5, 10, 20, 50];
+const DEFAULT_SPEED_STEPS = [20, 50, 100, 200, 500];
 const DEFAULT_PRESETS = [
   { label: 'Normal', speed: 1 },
   { label: 'Fast', speed: 5 },

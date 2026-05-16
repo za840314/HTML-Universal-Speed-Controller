@@ -130,6 +130,15 @@ p {
   align-items: center;
 }
 
+.keep-alive {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px;
+  background-color: #2d2d2d;
+  border-radius: 4px;
+}
+
 .toggle-item label {
   display: flex;
   align-items: center;
