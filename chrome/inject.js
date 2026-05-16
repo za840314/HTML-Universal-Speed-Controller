@@ -47,6 +47,13 @@
   // and freezes the tab ("spiral of death"). Clamping bounds the catch-up.
   const MAX_TICK_ELAPSED = 200;
 
+  // Lower bound on the real delay handed to the browser when speed > 1.
+  // Without it a fast timer is rescheduled every fraction of a millisecond;
+  // its callbacks then run back-to-back with no idle time, pinning a CPU core
+  // and exhausting memory. Only applied while compressing delays (speed > 1)
+  // so 1x ("Normal") stays fully transparent.
+  const MIN_REAL_DELAY = 8;
+
   // Virtual clock: accumulates the *extra* elapsed time produced by speed != 1.
   // performance.now()/Date.now() report originalNow + virtualOffset.
   let virtualOffset = 0;
@@ -67,7 +74,8 @@
     delay = Number(delay) || 0;
     if (!enabled) return delay;
     if (speedConfig.speed <= 0) return MAX_DELAY; // paused
-    return delay / speedConfig.speed;
+    const adjusted = delay / speedConfig.speed;
+    return speedConfig.speed > 1 ? Math.max(adjusted, MIN_REAL_DELAY) : adjusted;
   };
 
   // Every interval the page creates is tracked here so a later speed change can
