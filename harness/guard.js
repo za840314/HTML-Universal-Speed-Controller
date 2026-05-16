@@ -28,11 +28,13 @@ const failures = [];
   }
   const realElapsed = sb.clock.t - realStart;
   const ratio = (sb.fakeDate.now() - virtualStart) / realElapsed;
-  const minFires = (realElapsed / 100) * 1.5; // 100ms timer must run >=1.5x baseline
+  // At 10x a 100ms timer should fire ~every 10ms. A 30% margin tolerates a
+  // small timer-delay floor but rejects any floor that caps the speedup.
+  const expectedFires = realElapsed / (100 / SPEED);
   if (ratio < 8 || ratio > 12)
     failures.push(`A: ${SPEED}x speedup ratio ${ratio.toFixed(2)} outside [8,12]`);
-  if (sb.stats.intervalFires < minFires)
-    failures.push(`A: timer fired ${sb.stats.intervalFires}, expected >= ${minFires.toFixed(0)}`);
+  if (sb.stats.intervalFires < expectedFires * 0.7)
+    failures.push(`A: timer fired ${sb.stats.intervalFires}, expected >= ${(expectedFires * 0.7).toFixed(0)}`);
 }
 
 // --- Scenario B: coarse-grained 2s timer drives the clock reads ---
